@@ -10,21 +10,28 @@ jobs:
     environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Port check
+      # Quick connectivity check (port 21)
+      - name: FTPS port check
         run: nc -vz -w 5 "$HOST" "$PORT"
         env:
           HOST: ${{ secrets.HOSTINGER_HOST }}
           PORT: ${{ secrets.HOSTINGER_PORT }}
 
-      - name: Deploy via SFTP
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+      - name: Deploy via FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4
         with:
-          server: ${{ secrets.HOSTINGER_HOST }}
+          server: ${{ secrets.HOSTINGER_HOST }} # IP only
           username: ${{ secrets.HOSTINGER_USER }}
           password: ${{ secrets.HOSTINGER_PASSWORD }}
-          port: ${{ secrets.HOSTINGER_PORT }}
-          local_path: "public/*"
-          remote_path: ${{ secrets.HOSTINGER_TARGET }}
-          sftp_only: true
+          port: ${{ secrets.HOSTINGER_PORT }} # 21
+          protocol: ftps # explicit FTPS
+          local-dir: public/
+          server-dir: ${{ secrets.HOSTINGER_TARGET }}
+          exclude: |
+            **/.git*
+            **/.DS_Store
+          # Optional: more logs while debugging
+          # log-level: verbose
