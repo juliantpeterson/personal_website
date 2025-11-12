@@ -10,28 +10,21 @@ jobs:
     environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # (Optional) quick connectivity preflight
-      - name: DNS + Port preflight
-        run: |
-          echo "Env: ${{ job.environment }}"
-          echo "Testing TCP connectivity to $HOST:$PORT ..."
-          timeout 5 bash -c "cat < /dev/null > /dev/tcp/${HOST}/${PORT}" \
-            && echo "Port open ✅" || (echo "Port closed ❌" && exit 1)
+      - name: Port check
+        run: nc -vz -w 5 "$HOST" "$PORT"
         env:
           HOST: ${{ secrets.HOSTINGER_HOST }}
           PORT: ${{ secrets.HOSTINGER_PORT }}
 
-      # Upload plain HTML from /public
       - name: Deploy via SFTP
         uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
-          server: ${{ secrets.HOSTINGER_HOST }} # <-- IP address
+          server: ${{ secrets.HOSTINGER_HOST }}
           username: ${{ secrets.HOSTINGER_USER }}
           password: ${{ secrets.HOSTINGER_PASSWORD }}
-          port: ${{ secrets.HOSTINGER_PORT }} # 22
+          port: ${{ secrets.HOSTINGER_PORT }}
           local_path: "public/*"
-          remote_path: ${{ secrets.HOSTINGER_TARGET }} # /public_html_staging/
+          remote_path: ${{ secrets.HOSTINGER_TARGET }}
           sftp_only: true
