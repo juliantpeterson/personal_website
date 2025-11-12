@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.3.6
 
       # Plain HTML: deploy the public/ folder
       # Later (React), add Node build steps and switch local-dir to dist/
