@@ -1,0 +1,20 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [ "staging", "main" ]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Minimal sanity checks for a plain-HTML site
+      - name: Ensure public/index.html exists
+        run: test -f public/index.html
+
+      # (Optional) show contents for debugging
+      - name: List public dir
+        run: ls -la public

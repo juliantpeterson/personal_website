@@ -1,0 +1,49 @@
+name: Deploy Website
+
+on:
+  push:
+    branches: [ "staging", "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    # If branch is main → environment=production; otherwise staging
+    environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Plain HTML: deploy the public/ folder
+      # Later (React), add Node build steps and switch local-dir to dist/
+
+      # --- FTPS OPTION (default) ---
+      - name: Deploy via FTPS
+        if: ${{ env.USE_SFTP != 'true' }}
+        uses: SamKirkland/FTP-Deploy-Action@v4
+        with:
+          server:   ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USER }}
+          password: ${{ secrets.HOSTINGER_PASSWORD }}
+          port:     ${{ secrets.HOSTINGER_PORT }}   # e.g. 21
+          protocol: ftps
+          local-dir: public/
+          server-dir: ${{ secrets.HOSTINGER_TARGET }}
+          exclude: |
+            **/.git*
+            **/.DS_Store
+
+      # --- SFTP OPTION (uncomment if you prefer SFTP) ---
+      # - name: Deploy via SFTP
+      #   if: ${{ env.USE_SFTP == 'true' }}
+      #   uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+      #   with:
+      #     server: ${{ secrets.HOSTINGER_HOST }}
+      #     username: ${{ secrets.HOSTINGER_USER }}
+      #     password: ${{ secrets.HOSTINGER_PASSWORD }}
+      #     port:     ${{ secrets.HOSTINGER_PORT }}  # e.g. 22
+      #     local_path: "public/*"
+      #     remote_path: ${{ secrets.HOSTINGER_TARGET }}
+      #     sftp_only: true
+
