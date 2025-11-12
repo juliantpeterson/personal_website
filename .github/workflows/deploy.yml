@@ -21,7 +21,7 @@ jobs:
       # --- FTPS OPTION (default) ---
       - name: Deploy via FTPS
         if: ${{ env.USE_SFTP != 'true' }}
-        uses: SamKirkland/FTP-Deploy-Action@v4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
           server:   ${{ secrets.HOSTINGER_HOST }}
           username: ${{ secrets.HOSTINGER_USER }}
