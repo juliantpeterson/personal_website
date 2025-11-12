@@ -1,0 +1,10 @@
+# macOS files
+.DS_Store
+
+# Node / build files (later for React)
+node_modules/
+dist/
+build/
+
+# Env files
+.env
